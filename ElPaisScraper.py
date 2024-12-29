@@ -14,15 +14,32 @@ import json
 import re
 from collections import Counter
 from typing import Union, List
-
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 class ElPaisScraper:
     """
     This class scrapes opinion articles and related data from El Pais website.
 
     """
+    desired_cap = {
+	'bstack:options' : {
+		"os" : "Windows",
+		"osVersion" : "10",
+		"resolution" : "1920x1080",
+		"projectName" : "Mark test as pass fail using JS Executor", #test name
+		"buildName" : "Sample Build", #CI/CD job or build name
+		"seleniumVersion" : "4.0.0",
+	},
+	"browserName" : "Chrome",
+	"browserVersion" : "103.0",
+}
+    driver = webdriver.Remote(
+    command_executor='https://badarinathlr_1gVNq9:hGExLfCKxGRjyiHCzbg7@hub-cloud.browserstack.com/wd/hub',
+    desired_capabilities=desired_cap)   
+
+
     def __init__(self, api_key, device_type='None'):
         # Initializes the scraper with the provided API key and device type.
-        self.chrome_options = Options()
+        self.chrome_options = Options()    
 
         self.device_type = device_type or self.detect_device_type()
         if device_type == 'mobile':
@@ -50,21 +67,7 @@ class ElPaisScraper:
         self.api_key = api_key
         self.output_dir = "opinion_article_images"
         self.device_type = device_type
-        os.makedirs(self.output_dir, exist_ok=True)
-
-    def set_test_status(self, status, reason):
-            
-             # Function to set status on BrowserStack (if applicable)
-         executor_object = {
-                           'action': 'setSessionStatus',
-                           'arguments': {
-                           'status' : "<passed/failed>",'reason' : "<reason>"
-                           }
-                       }   
-
-         browserstack_executor = 'browserstack_executor: {}'.format(json.dumps(executor_object))
-         self.driver.execute_script(browserstack_executor) 
-              
+        os.makedirs(self.output_dir, exist_ok=True)              
 
     def detect_device_type(self):
          #Detects the device type based on an environment variable.
@@ -243,7 +246,7 @@ class ElPaisScraper:
             self.analyze_repeated_words(translated_articles)
             
             print("\nAll tasks completed successfully!")
-            self.set_test_status(status="pass",reason="All tests passed")
+            self.driver.execute_script('browserstack_executor: {"action": "setSessionStatus", "arguments": {"status":"passed", "reason": "All Tests completed!"}}')
             
         finally:
             self.driver.quit()
