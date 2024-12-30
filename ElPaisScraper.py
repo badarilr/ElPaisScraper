@@ -125,7 +125,15 @@ class ElPaisScraper:
                 headline = article.find_element(By.CSS_SELECTOR, "h2").text
                 assert headline , f"Content extracted for article {i+1}"
                 
+                
                 print(f"Headline {i+1}: {headline}")
+
+                try:
+                    content =article.find_element(By.CSS_SELECTOR,"p").text
+                except:
+                    content ="No content available"
+                assert headline , f"Content extracted for article {i+1}"
+                print(f"Content {i+1}: {content}\n")
                 
                 article_entry = {
                     "headline": headline,                   
